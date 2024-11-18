@@ -5,18 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Storage;
 
 class ProdController extends Controller
 {
     public function index()
     {
-        $products = Product::orderBy('created_at', 'DESC')->get();
-
-        return view('products.list', [
-            'products' => $products
-        ]);
+        $products = Product::all();
+        return view('products.list', compact('products'));
     }
 
     public function create()
@@ -26,108 +22,73 @@ class ProdController extends Controller
 
     public function store(Request $request)
     {
-        $rules = [
+        // Validate the incoming request data
+        $request->validate([
             'name' => 'required|min:5',
-            'price' => 'required|numeric'
-        ];
+            'price' => 'required|numeric',
+            'image' => 'nullable|image'
+        ]);
 
-        if ($request->image != "") {
-            $rules['image'] = 'image';
-        }
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return redirect()->route('products.create')->withInput()->withErrors($validator);
-        }
-
-        // here we will insert product in db
+        // Create a new product
         $product = new Product();
         $product->name = $request->name;
         $product->price = $request->price;
         $product->description = $request->description;
-        $product->save();
 
-        if ($request->image != "") {
-            // here we will store image
-            $image = $request->image;
-            $ext = $image->getClientOriginalExtension();
-            $imageName = time() . '.' . $ext; // Unique image name
-
-            // Save image to products directory
-            $image->move(public_path('uploads/products'), $imageName);
-
-            // Save image name in database
-            $product->image = $imageName;
-            $product->save();
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('products', 'public'); // Store the image
+            $product->image = $imagePath; // Save the image path in the database
         }
+
+        $product->save(); // Save the product
 
         return redirect()->route('products.index')->with('success', 'Product added successfully.');
     }
 
-    public function edit($id)
+    public function edit(Product $product)
     {
-        $product = Product::findOrFail($id);
-        return view('products.edit', [
-            'product' => $product
-        ]);
+        return view('products.edit', compact('product'));
     }
 
-    public function update($id, Request $request)
+    public function update(Request $request, Product $product)
     {
-
-        $product = Product::findOrFail($id);
-
-        $rules = [
+        // Validate the incoming request data
+        $request->validate([
             'name' => 'required|min:5',
-            'price' => 'required|numeric'
-        ];
+            'price' => 'required|numeric',
+            'image' => 'nullable|image'
+        ]);
 
-        if ($request->image != "") {
-            $rules['image'] = 'image';
-        }
-
-        $validator = Validator::make($request->all(), $rules);
-
-        if ($validator->fails()) {
-            return redirect()->route('products.edit', $product->id)->withInput()->withErrors($validator);
-        }
-
-        // here we will update product
+        // Update product details
         $product->name = $request->name;
         $product->price = $request->price;
         $product->description = $request->description;
-        $product->save();
 
-        if ($request->image != "") {
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
 
-            // delete old image
-            File::delete(public_path('uploads/products/' . $product->image));
-
-            // here we will store image
-            $image = $request->image;
-            $ext = $image->getClientOriginalExtension();
-            $imageName = time() . '.' . $ext; // Unique image name
-
-            // Save image to products directory
-            $image->move(public_path('uploads/products'), $imageName);
-
-            // Save image name in database
-            $product->image = $imageName;
-            $product->save();
+            $imagePath = $request->file('image')->store('products', 'public'); // Store the new image
+            $product->image = $imagePath; // Save the new image path in the database
         }
+
+        $product->save(); // Save the updated product
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully.');
     }
 
-    public function destroy($id)
+    public function destroy(Product $product)
     {
-        $product = Product::findOrFail($id);
+        // Delete the image if it exists
+        if ($product->image && Storage::disk('public')->exists($product->image)) {
+            Storage::disk('public')->delete($product->image);
+        }
 
-        // delete image
-        File::delete(public_path('uploads/products/' . $product->image));
-
-        // delete product from database
+        // Delete the product from the database
         $product->delete();
 
         return redirect()->route('products.index')->with('success', 'Product deleted successfully.');

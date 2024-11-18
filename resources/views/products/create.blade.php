@@ -41,6 +41,7 @@
                             </div>
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-lg btn-primary">Submit</button>
+                                <a href="{{ route('products.list') }}" class="btn btn-secondary">Back</a>
                             </div>
                         </div>
                     </form>
