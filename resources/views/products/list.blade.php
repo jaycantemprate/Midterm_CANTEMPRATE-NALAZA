@@ -38,7 +38,6 @@
                                 <th>ID</th>
                                 <th></th>
                                 <th>Name</th>
-                                <th>Sku</th>
                                 <th>Price</th>
                                 <th>Created at</th>
                                 <th>Action</th>
@@ -55,7 +54,6 @@
                                             @endif
                                         </td>
                                         <td>{{ $product->name }}</td>
-                                        <td>{{ $product->sku }}</td>
                                         <td>${{ $product->price }}</td>
                                         <td>{{ \Carbon\Carbon::parse($product->created_at)->format('d M, Y') }}</td>
                                         <td>
