@@ -22,42 +22,49 @@
         </div>
         <div class="row d-flex justify-content-center">
             <div class="col-md-10">
-                <div class="card borde-0 shadow-lg my-4">
+                <div class="card border-0 shadow-lg my-4">
                     <div class="card-header bg-dark">
                         <h3 class="text-white">Create Product</h3>
                     </div>
-                    <form enctype="multipart/form-data" action="{{ route('products.store') }}" method="post">
+                    <form enctype="multipart/form-data" action="{{ route('products.store') }}" method="POST">
                         @csrf
                         <div class="card-body">
                             <div class="mb-3">
-                                <label for="" class="form-label h5">Name</label>
-                                <input value="{{ old('name') }}" type="text"
-                                    class="@error('name') is-invalid @enderror form-control-lg form-control"
-                                    placeholder="Name" name="name">
+                                <label for="name" class="form-label h5">Name</label>
+                                <input id="name" type="text" name="name" value="{{ old('name') }}"
+                                    class="form-control form-control-lg @error('name') is-invalid @enderror"
+                                    placeholder="Name">
                                 @error('name')
-                                    <p class="invalid-feedback">{{ $message }}</p>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="mb-3">
-                                <label for="" class="form-label h5">Price</label>
-                                <input value="{{ old('price') }}" type="text"
-                                    class="@error('price') is-invalid @enderror form-control form-control-lg"
-                                    placeholder="Price" name="price">
+                                <label for="price" class="form-label h5">Price</label>
+                                <input id="price" type="text" name="price" value="{{ old('price') }}"
+                                    class="form-control form-control-lg @error('price') is-invalid @enderror"
+                                    placeholder="Price">
                                 @error('price')
-                                    <p class="invalid-feedback">{{ $message }}</p>
+                                    <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="mb-3">
-                                <label for="" class="form-label h5">Description</label>
-                                <textarea placeholder="Description" class="form-control" name="description" cols="30" rows="5">{{ old('description') }}</textarea>
+                                <label for="description" class="form-label h5">Description</label>
+                                <textarea id="description" name="description" cols="30" rows="5"
+                                    class="form-control @error('description') is-invalid @enderror" placeholder="Description">{{ old('description') }}</textarea>
+                                @error('description')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="mb-3">
-                                <label for="" class="form-label h5">Image</label>
-                                <input type="file" class="form-control form-control-lg" placeholder="Price"
-                                    name="image">
+                                <label for="image" class="form-label h5">Product Image</label>
+                                <input id="image" type="file" name="image"
+                                    class="form-control form-control-lg @error('image') is-invalid @enderror">
+                                @error('image')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="d-grid">
-                                <button class="btn btn-lg btn-primary">Submit</button>
+                                <button type="submit" class="btn btn-lg btn-primary">Submit</button>
                             </div>
                         </div>
                     </form>
