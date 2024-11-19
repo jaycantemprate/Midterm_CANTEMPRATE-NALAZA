@@ -42,7 +42,7 @@
                                     </td>
                                     <td>{{ $product->name }}</td>
                                     <td>${{ $product->price }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($product->created_at)->format('d M, Y') }}</td>
+                                    <td>{{ \Carbon\Carbon::parse($products->created_at)->format('d M, Y') }}</td>
                                     <td>
                                         <a href="{{ route('products.edit', $product->id) }}"
                                             class="btn btn-dark">Edit</a>
@@ -56,7 +56,6 @@
                                     </td>
                                 </tr>
                             @endforeach
-                            @endif
                         </table>
                     </div>
                 </div>
